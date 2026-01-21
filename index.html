@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Приглашение от Ибрашки</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #0f0f1a, #000);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .neon {
+      color: #fff;
+      text-shadow: 0 0 5px #00fff7, 0 0 10px #00fff7, 0 0 20px #00c8ff;
+    }
+    .screen {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      animation: fadeIn 1.2s ease forwards;
+    }
+    .screen.active { display: block; }
+    h1 { font-size: 30px; margin-bottom: 10px; }
+    p { opacity: 0.9; }
+    input {
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      width: 80%;
+      max-width: 260px;
+      font-size: 16px;
+      margin-top: 15px;
+      text-align: center;
+    }
+    button {
+      margin-top: 25px;
+      padding: 14px 30px;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #00fff7, #7928ca);
+      color: black;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00fff7;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ввод имени -->
+  <div class="screen" id="nameScreen">
+    <h1 class="neon">Стоп ✋</h1>
+    <p>Вход только для своих.<br>Как тебя зовут?</p>
+    <form onsubmit="submitName(event)">
+      <input id="nameInput" placeholder="Введи имя" />
+      <br />
+      <button type="submit">Войти</button>
+    </form>
+  </div>
+
+  <!-- Секретный экран -->
+  <div class="screen" id="secretScreen">
+    <h1 class="neon">🚫 Доступ закрыт</h1>
+    <p>Без имени сюда нельзя</p>
+    <button onclick="show('nameScreen')">Вернуться</button>
+  </div>
+
+  <!-- Приглашение -->
+  <div class="screen" id="inviteScreen">
+    <h1 class="neon" id="title"></h1>
+    <p id="phrase"></p>
+    <p style="margin-top:30px">
+      🎂 <b>Ибрашка</b> ждёт тебя<br><br>
+      📅 <b>28.01</b> в <b>18:00</b><br>
+      📍 <b>У меня дома</b><br>
+      <span style="opacity:0.7">Кто не знает — Абая 32/1</span>
+    </p>
+    <button onclick="confirm()">Я приду 🎉</button>
+    <br>
+    <button onclick="show('noComeScreen')" style="margin-top:15px;background:linear-gradient(135deg,#ff004c,#ff7a00);box-shadow:0 0 15px #ff004c;">Не приду 😈</button>
+  </div>
+
+  <!-- Экран причин -->
+  <div class="screen" id="noComeScreen">
+    <h1 class="neon">Ну как так 😈</h1>
+    <p>Выбери причину:</p>
+    <button onclick="sendReason(1)">Я на работе и вообще я чёрт 🤡</button><br>
+    <button onclick="sendReason(2)">Жена не пускает и вообще я чёрт 🤦‍♂️</button><br>
+    <button onclick="sendReason(3)">Просто не хочу и вообще я чёрт 😈</button><br>
+    <button onclick="show('inviteScreen')" style="margin-top:20px;background:#333;color:#fff;box-shadow:none">Назад</button>
+  </div>
+
+<script>
+  const phrases = [
+    "Без тебя этот вечер не будет таким же ✨",
+    "Готовься — будет неон и шум 🔥",
+    "Ты в списке. Отказ не принимается 😎",
+    "Этот вечер станет легендой 💫"
+  ];
+
+  const myNumber = '7776969698'; // <-- сюда твой номер WhatsApp
+
+  window.onload = () => {
+    const savedName = localStorage.getItem('guestName');
+    if (savedName) {
+      document.getElementById('title').innerText = savedName + ', ты приглашён';
+      document.getElementById('phrase').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+      show('inviteScreen');
+    } else {
+      show('nameScreen');
+    }
+  };
+
+  function submitName(e) {
+    e.preventDefault();
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name || !/^[A-Za-zА-Яа-яЁё\s]+$/.test(name)) {
+      alert('Пожалуйста, введи настоящее имя, только буквы.');
+      show('nameScreen');
+      return;
+    }
+    localStorage.setItem('guestName', name);
+    document.getElementById('title').innerText = name + ', ты приглашён';
+    document.getElementById('phrase').innerText = phrases[Math.floor(Math.random() * phrases.length)];
+    show('inviteScreen');
+  }
+
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function confirm() {
+    const name = localStorage.getItem('guestName') || 'Гость';
+    const text = `Привет, Ибрашка! Это ${name}. Я приду на ДР 🎉`;
+    window.location.href = `https://wa.me/${myNumber}?text=${encodeURIComponent(text)}`;
+  }
+
+  function sendReason(type) {
+    const name = localStorage.getItem('guestName') || 'Гость';
+    let text = '';
+    if (type === 1) text = `Привет, Ибрашка! Это ${name}. Я на работе и вообще я чёрт 🤡`;
+    if (type === 2) text = `Привет, Ибрашка! Это ${name}. Жена не пускает и вообще я чёрт 🤦‍♂️`;
+    if (type === 3) text = `Привет, Ибрашка! Это ${name}. Просто не хочу и вообще я чёрт 😈`;
+    window.location.href = `https://wa.me/${7776969698}?text=${encodeURIComponent(text)}`;
+  }
+</script>
+</body>
+</html>
